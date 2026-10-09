@@ -1,0 +1,39 @@
+# === DADOS DE PACIENTES (LGPD) - NUNCA versionar ===
+dados/
+dados_reais/
+exportacoes/
+laudos/
+saida/
+*.dcm
+*.dicom
+*.pdf
+*.csv
+*.xlsx
+*.xls
+*.sqlite
+*.db
+*.bak
+# exceção: apenas dados sintéticos de exemplo
+!dados_exemplo/
+!dados_exemplo/**
+
+# === Credenciais ===
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+secrets/
+credenciais*
+config.local.*
+
+# === Sistema / ferramentas ===
+.claude/settings.local.json
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
