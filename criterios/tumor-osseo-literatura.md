@@ -3,7 +3,7 @@
 > **RASCUNHO para revisão do Dr. Kieling.** Não contém dado de paciente. A avaliação é apoio; a decisão final é do radiologista.
 > Fonte: "Tumores ósseos e lesões pseudotumorais na imagem (RX, TC, RM): referência" (revisão 2006–2026, OMS 2020, out/2026).
 > Regras gerais em `geral.md`. A própria fonte pede conferência: condroblastoma/FCM (benignos x intermediários na OMS 2020), correspondência Lodwick clássico x modificado, nidus/penumbra/vácuo (valores de livro-texto).
-> Enneking e Campanacci **não constam** na fonte: não usar como critério.
+> Os itens da seção "Acréscimos aprovados pelo Dr. Kieling" **não vêm das fontes** (conhecimento geral, a confirmar pelo Dr.). Enneking (estadiamento cirúrgico) **não** é exigido; só a extensão por compartimento.
 
 ## Regra de ouro
 - RX é o exame que mais diferencia; TC/RM caracterizam matriz, cortical, extensão e estadiamento. **Idade** é o dado clínico principal: <30 anos maioria primária (<20: incluir infecção e LCH); >40 anos metástase e mieloma entram em qualquer diferencial, mesmo com aspecto benigno. Infecção imita tudo.
@@ -54,11 +54,19 @@
 - Simuladores "não toque" (FNO, enostose, DF típica, geode, hemangioma típico, infarto, lipoma intraósseo etc.): impressão deve dizer "sem necessidade de investigação adicional". Miosite ossificante precoce simula sarcoma: biópsia precoce pode errar.
 - Conduta (ACR 2024): RX inicial; RX negativo com suspeita: RM; agressiva/indeterminada: RM sem e com contraste e PET-FDG/TC; **encaminhar ao centro de sarcoma antes da biópsia**; estadiamento: RM do osso inteiro, TC de tórax, cintilografia/PET.
 
+## Acréscimos aprovados pelo Dr. Kieling (fora das fontes; conferir antes de usar como regra da casa)
+Ordem de prioridade para a avaliação de laudo de tumor ósseo:
+1. **Coerência entre achado e classificação usada.** A classificação citada (Lodwick, Bone-RADS, Mirels, SINS) tem de bater com o que foi descrito no corpo. Ex.: Lodwick III ou periostite agressiva descritos e conclusão "benigno"; Bone-RADS 2 com margem III e partes moles.
+2. **Extensão: cortical, partes moles e compartimento.** O laudo diz se a lesão está confinada ao osso (intracompartimental) ou rompeu a cortical e invade partes moles/articulação (extracompartimental), e se há outras lesões ou metástase à distância. Não se exige estágio cirúrgico nem grau histológico (não saem da imagem).
+3. **Matriz, zona de transição e reação periosteal descritas** (matriz: lítica, esclerótica, condroide, osteoide, em vidro fosco; zona de transição: Lodwick; periósteo: ausente/sólido/agressivo e tipo).
+4. **Conduta compatível com a categoria Bone-RADS** da tabela acima (ex.: categoria 4 sem encaminhamento; categoria 1 com biópsia desnecessária).
+5. **Campanacci, só se o diagnóstico for tumor de células gigantes.** Graduação radiográfica: I = limites nítidos com aro fino, cortical íntegra; II = limites relativamente definidos sem aro, cortical adelgaçada e expandida sem ruptura; III = limites borrados, destruição cortical e/ou extensão a partes moles. O grau citado deve ser coerente com o descrito. Não cobrar em outras lesões.
+
 ## O que deve constar no laudo
 1. Osso, segmento (epífise/metáfise/diáfise), posição (central, excêntrica, cortical, justacortical), **lado**.
 2. Medidas LxAPxCC (RM: comprimento medular total).
 3. Padrão (lítico/esclerótico/misto), matriz, margem e Lodwick.
-4. Cortical (festonamento em fração, insuflação, ruptura); periósteo (ausente, sólido, agressivo + tipo).
+4. Cortical (festonamento em fração, insuflação, ruptura); periósteo (ausente, sólido, agressivo + tipo); **compartimento (confinada ao osso x extensão a partes moles/articulação)**.
 5. Partes moles (medir; relação com feixe e articulação); fratura patológica.
 6. RM: T1 x músculo, T2, realce, edema perilesional, níveis, gordura/fora de fase, fise/epífise/articulação, lesões salteadas.
 7. Lesões múltiplas ou outras no exame.
@@ -76,4 +84,9 @@
 | Capa do osteocondroma não medida; enostose sem UH; T1 não descrito na RM | Média |
 | Lesão "não toque" com conduta/investigação desnecessária sugerida (ou o contrário) | Média |
 | Contraste usado para medir densidade; cintilografia sugerida em mieloma | Média |
+| Classificação citada incompatível com o descrito no corpo (Lodwick, Bone-RADS, Mirels, SINS) | Alta |
+| Extensão não descrita (cortical, partes moles, compartimento) em lesão agressiva ou indeterminada | Média |
+| Conduta incompatível com a categoria Bone-RADS citada | Alta |
+| Tumor de células gigantes com grau de Campanacci incompatível com o descrito (só se citado o grau) | Média |
+| Matriz, zona de transição ou reação periosteal não descritas | Média |
 | Segmento/posição sem especificar (epífise, metáfise, diáfise) ou sem frase de achado fora do alvo | Baixa |
