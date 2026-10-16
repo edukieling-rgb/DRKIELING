@@ -26,8 +26,19 @@ Nenhum conteúdo desses arquivos foi copiado para o repositório. Este arquivo l
 | revisoes/rx-licoes-revisao | lições de erros |
 | revisoes/Bocio_mergulhante_TC_torax (pasta) | laudo em PDF e imagens de corte |
 
-## Ainda não lidos (material de literatura, sem sinal de caso real)
-Revisões de TC de crânio (partes 0, A, C e D), de TC de tórax, de linfonodos mediastinais, de TC de abdome, BI-RADS v2025, tumor ósseo, osteomielite, lesões hepáticas focais, FAV/Doppler, tireoide, nódulo pulmonar, coluna, seios da face, mastoide, paniculite mesentérica, RX pediátrico, vértebra de transição, enfisema/PINE/PIU, divertículos/hérnia umbilical. Serão lidos sob a mesma regra: se aparecer nome de paciente, o arquivo entra na tabela acima.
+## Literatura: contêm nome de paciente (conteúdo descartado)
+| Arquivo (pasta revisoes) | Onde |
+|---|---|
+| rx-pediatrico-referencia.md | títulos de dois casos (nomes completos de crianças, com idade e data) — prioridade |
+| paniculite-mesenterica-referencia.md | parágrafo de abertura (nome completo) — prioridade |
+| birads-v2025-referencia | seção 7.1 item 1 e seção 7.2 item 4 |
+| seios-face-referencia.md | seção 7 (checklist do pré-laudo), item 11 |
+| vertebra-transicao-variacoes-referencia.md | parágrafo de abertura |
+| mastoide-colesteatoma-referencia.md | seção 7 (frases-modelo) |
+
+## Literatura: lidos e sem nome de paciente (a incorporar nos critérios)
+Revisão TC crânio partes 0, A, C e D; revisão TC de tórax; linfonodos mediastinais; revisão TC de abdome; tumor-osseo-referencia; figado-lesoes-focais-referencia; osteomielite-referencia (doc e .md); fav-doppler-referencia; coluna-referencia.md; tireoide-referencia.md; nodulo-pulmonar-referencia.md; enfisema-pine-piu-referencia.md; diverticulos-hernia-umbilical-referencia.md.
+Observação: coluna-referencia e as partes A, C e D do crânio foram verificadas por busca automática, não por leitura linha a linha; vale uma conferência visual.
 
 ## Incorporado
 `geral.md`, `tc-cranio.md`, `tc-torax.md`, `tc-abdome-total.md` (inclui urotomografia), `us-tireoide.md`, `us-vias-urinarias-prostata.md`, `doppler-fav.md`.
