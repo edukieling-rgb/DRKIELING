@@ -40,6 +40,14 @@ Nenhum conteúdo desses arquivos foi copiado para o repositório. Este arquivo l
 Revisão TC crânio partes 0, A, C e D; revisão TC de tórax; linfonodos mediastinais; revisão TC de abdome; tumor-osseo-referencia; figado-lesoes-focais-referencia; osteomielite-referencia (doc e .md); fav-doppler-referencia; coluna-referencia.md; tireoide-referencia.md; nodulo-pulmonar-referencia.md; enfisema-pine-piu-referencia.md; diverticulos-hernia-umbilical-referencia.md.
 Observação: coluna-referencia e as partes A, C e D do crânio foram verificadas por busca automática, não por leitura linha a linha; vale uma conferência visual.
 
-## Incorporado
+## Conferir (sem nome, mas com referência a caso real)
+- enfisema-pine-piu-referencia.md: seção 4.6 descreve um caso real (sexo e idade, sem nome). Trecho não usado.
+- osteomielite-referencia (doc e .md): seção 7 cita uma revisão de laudo real de TC de quadril, com data, sem nome. Trecho não usado.
+- Revisão TC de crânio: a parte B (TCE) não aparece na pasta; se existir, falta enviar.
+
+## Incorporado (literatura)
+`tc-cranio-literatura.md`, `tc-torax-literatura.md`, `tc-abdome-literatura.md`, `us-tireoide-literatura.md`, `doppler-fav-literatura.md`, `coluna-literatura.md`, `tumor-osseo-literatura.md`, `osteomielite-literatura.md`.
+
+## Incorporado (modelos)
 `geral.md`, `tc-cranio.md`, `tc-torax.md`, `tc-abdome-total.md` (inclui urotomografia), `us-tireoide.md`, `us-vias-urinarias-prostata.md`, `doppler-fav.md`.
 `geral.md` também usa as regras gerais do Manual de pré-laudo (estrutura, itálico, impressão, OBS, medidas), sem nenhum exemplo com nome.
