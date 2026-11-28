@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora O-RADS (US e RM)</title>
+</head>
+<body>
+<!--
+  Calculadora O-RADS (US v2022 e RM) - Exames Lajeado
+  Código original. Roda inteiramente no navegador: não envia, não grava e não coleta nenhum dado.
+  Para colar no WordPress: copie tudo entre "INÍCIO DO BLOCO" e "FIM DO BLOCO" em um bloco "HTML personalizado".
+-->
+<!-- INÍCIO DO BLOCO -->
+<style>
+.orads-calc{--verde:#33b458;--verde-esc:#2da54f;--grafite:#3d3d41;--cinza:#efefef;--borda:#d7d7d7;
+  max-width:860px;margin:0 auto;padding:16px;font-family:inherit;color:var(--grafite);line-height:1.45;box-sizing:border-box}
+.orads-calc *{box-sizing:border-box}
+.orads-calc h2{font-size:26px;margin:0 0 6px;font-weight:800}
+.orads-calc .oc-sub{margin:0 0 18px;font-size:15px}
+.orads-calc .oc-painel{background:var(--cinza);border-radius:5px;padding:20px}
+.orads-calc fieldset{border:0;margin:0 0 18px;padding:0;min-width:0}
+.orads-calc legend{font-weight:700;font-size:16px;padding:0;margin-bottom:4px}
+.orads-calc .oc-dica{font-size:13.5px;margin:0 0 8px;color:#55555a}
+.orads-calc .oc-opcoes{display:flex;flex-wrap:wrap;gap:8px}
+.orads-calc .oc-opcoes label{position:relative;cursor:pointer}
+.orads-calc .oc-opcoes input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.orads-calc .oc-opcoes span{display:block;background:#fff;border:2px solid var(--borda);border-radius:5px;padding:9px 14px;font-size:14.5px;font-weight:600;transition:.15s}
+.orads-calc .oc-opcoes input:checked+span{background:var(--verde);border-color:var(--verde-esc);color:#fff}
+.orads-calc .oc-opcoes input:focus-visible+span{outline:3px solid #007aff;outline-offset:2px}
+.orads-calc .oc-num{width:140px;padding:10px 12px;border:2px solid var(--borda);border-radius:5px;font-size:16px;font-family:inherit}
+.orads-calc .oc-botao{background:var(--grafite);color:#fff;border:0;border-radius:5px;padding:12px 26px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+.orads-calc .oc-botao:hover{background:#000}
+.orads-calc .oc-botao.oc-claro{background:#fff;color:var(--grafite);border:2px solid var(--borda)}
+.orads-calc .oc-resultado{margin-top:20px;border-radius:5px;border:2px solid var(--borda);background:#fff;padding:18px}
+.orads-calc .oc-pendente{color:#55555a;font-size:14.5px;margin:0}
+.orads-calc .oc-cat{display:inline-block;border-radius:5px;padding:8px 16px;font-weight:800;font-size:22px;color:#fff;background:var(--grafite)}
+.orads-calc .oc-c0{background:#6b6b70}.orads-calc .oc-c1{background:#2da54f}.orads-calc .oc-c2{background:#33b458}
+.orads-calc .oc-c3{background:#d9a400}.orads-calc .oc-c4{background:#e67700}.orads-calc .oc-c5{background:#d6263c}
+.orads-calc .oc-linha{margin:10px 0 0;font-size:15px}
+.orads-calc .oc-nota{background:#fff4f4;border-left:4px solid #ff5268;padding:8px 12px;margin:10px 0 0;font-size:14px}
+.orads-calc .oc-laudo{width:100%;min-height:150px;margin-top:8px;padding:12px;border:2px solid var(--borda);border-radius:5px;font-family:inherit;font-size:15px;line-height:1.45;resize:vertical}
+.orads-calc .oc-acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.orads-calc .oc-ok{font-size:14px;color:var(--verde-esc);font-weight:700}
+.orads-calc .oc-rodape{font-size:12.5px;color:#55555a;margin-top:18px}
+.orads-calc .oc-rodape p{margin:0 0 6px}
+.orads-calc [hidden]{display:none!important}
+</style>
+
+<div class="orads-calc" id="orads-calc">
+  <h2>Calculadora O-RADS</h2>
+  <p class="oc-sub">Classificação de lesões ovarianas e anexiais por ultrassonografia (O-RADS US v2022) e ressonância magnética (O-RADS MRI), com frase pronta para o laudo. Ferramenta de apoio para médicos: nada é enviado ou armazenado.</p>
+  <div class="oc-painel">
+    <form id="oc-form" autocomplete="off" onsubmit="return false"></form>
+    <div class="oc-acoes"><button type="button" class="oc-botao oc-claro" id="oc-limpar">Recomeçar</button></div>
+  </div>
+  <div class="oc-resultado" id="oc-resultado" aria-live="polite"></div>
+  <div class="oc-rodape">
+    <p><strong>Fonte:</strong> O-RADS™ (Ovarian-Adnexal Reporting and Data System) é um sistema do American College of Radiology (ACR). Critérios baseados em: Strachowski LM et al., O-RADS US v2022, <em>Radiology</em> 2023;308(3):e230685; Andreotti RF et al., <em>Radiology</em> 2020;294(1):168-185; Reinhold C et al., O-RADS MRI lexicon, <em>J Am Coll Radiol</em> 2021;18(5):713-729; Thomassin-Naggara I et al., O-RADS MRI score, <em>JAMA Netw Open</em> 2020;3(1):e1919896. Consulte as tabelas oficiais em acr.org.</p>
+    <p>Esta calculadora é independente, não é produzida nem endossada pelo ACR, e não substitui o julgamento do médico radiologista. As condutas do O-RADS US foram elaboradas para pacientes de risco habitual e sem sintomas agudos. Confira sempre o resultado antes de usar no laudo.</p>
+  </div>
+</div>
+
+<script id="orads-logic">
+/* Lógica pura do O-RADS (sem acesso à página). Usada pela interface e pelos testes. */
+(function (raiz) {
+  'use strict';
+
+  var NOME_US = {0: 'avaliação incompleta', 1: 'ovário normal / achado fisiológico', 2: 'quase certamente benigno',
+    3: 'baixo risco', 4: 'risco intermediário', 5: 'alto risco'};
+  var RISCO_US = {0: 'não se aplica', 1: 'não se aplica', 2: '< 1%', 3: '1% a < 10%', 4: '10% a < 50%', 5: '≥ 50%'};
+  var NOME_RM = {0: 'avaliação incompleta', 1: 'ovários normais / achado fisiológico', 2: 'quase certamente benigno',
+    3: 'baixo risco', 4: 'risco intermediário', 5: 'alto risco'};
+  var VPP_RM = {0: 'não se aplica', 1: 'não se aplica', 2: '< 0,5%', 3: 'cerca de 5%', 4: 'cerca de 50%', 5: 'cerca de 90%'};
+
+  var SEG12 = 'US de controle em 12 meses (ao menos um controle em 1 ano demonstrando estabilidade ou redução; se estável, considerar seguimento anual por até 5 anos)';
+  var SEG6 = 'US de controle em 6 meses';
+
+  function csTxt(cs) { return 'escore de cor ' + cs; }
+
+  /* ---------- ULTRASSOM (O-RADS US v2022) ---------- */
+  function classificarUS(a) {
+    var r = {mod: 'US', cat: null, descr: '', conduta: '', notas: []};
+    if (a.us_tec === 'nao') {
+      r.cat = 0; r.descr = 'lesão não caracterizável por fatores técnicos';
+      r.conduta = 'Repetir a ultrassonografia ou realizar RM.';
+      return r;
+    }
+    var t = a.us_tam, pos = a.us_meno === 'pos';
+    switch (a.us_tipo) {
+      case 'normal':
+        r.cat = 1; r.descr = 'ovário de aspecto normal, sem lesão ovariana ou anexial'; r.conduta = 'Nenhuma conduta adicional de imagem.';
+        return r;
+      case 'nao_visto':
+        if (a.us_naovisto === 'exigido') {
+          r.cat = 0; r.descr = 'ovário não visualizado em exame no qual sua visualização é necessária';
+          r.conduta = 'Repetir a ultrassonografia ou realizar RM.';
+        } else {
+          r.descr = a.us_naovisto === 'ausente' ? 'ovário ausente cirurgicamente, sem lesão anexial' : 'ovário não visualizado, sem lesão anexial identificada';
+          r.naoAplicavel = true;
+          r.notas.push('O-RADS US em geral não se aplica quando o ovário não é visto e não há lesão anexial.');
+        }
+        return r;
+      case 'fisio':
+        r.cat = 1;
+        r.descr = a.us_fisio === 'foliculo' ? 'folículo (cisto simples ≤ 3 cm em paciente na pré-menopausa)' : 'corpo lúteo (≤ 3 cm, em paciente na pré-menopausa)';
+        r.conduta = 'Nenhuma conduta adicional de imagem.';
+        return r;
+      case 'extra':
+        r.cat = 2;
+        r.descr = {para: 'cisto paraovariano simples', incl: 'cisto de inclusão peritoneal', hidro: 'hidrossalpinge'}[a.us_extra] + ' de aspecto típico';
+        r.conduta = 'Sem necessidade de controle por imagem; manejo clínico com ginecologista, se indicado.';
+        if (a.us_extra === 'para') r.notas.push('Se o cisto paraovariano não for simples, classificar pelos critérios das lesões ovarianas.');
+        break;
+      case 'classico':
+        classicoUS(a, r, t, pos);
+        if (r.recategorizar) return r;
+        break;
+      case 'outra':
+        outraUS(a, r, t, pos);
+        break;
+      default:
+        return r;
+    }
+    /* Ascite e/ou nódulos peritoneais sem outra etiologia */
+    var extra = a.us_ascite === 'sim' || a.us_nodulos === 'sim';
+    if (extra && a.us_etiologia === 'nao') {
+      if (r.cat === 3 || r.cat === 4) {
+        r.cat = 5;
+        r.notas.push('Categoria elevada para O-RADS 5 pela presença de ascite e/ou nódulos peritoneais sem outra etiologia que os explique.');
+        r.conduta = CONDUTA5;
+      } else if (r.cat === 1 || r.cat === 2) {
+        r.notas.push('Ascite e/ou nódulos peritoneais com lesão O-RADS 1 ou 2: é obrigatório considerar outras etiologias (não elevam a categoria automaticamente).');
+      }
+    }
+    return r;
+  }
+
+  var CONDUTA3 = 'Se não houver excisão cirúrgica, US de controle em até 6 meses (se estável, novos controles em 12 e 24 meses). Manejo clínico: ginecologista.';
+  var CONDUTA4 = 'Avaliação por especialista em US (se disponível) ou RM com escore O-RADS MRI. Manejo clínico: ginecologista com consultoria de onco-ginecologia ou diretamente pelo onco-ginecologista.';
+  var CONDUTA5 = 'Encaminhar para onco-ginecologia; exames de imagem conforme o protocolo do onco-ginecologista.';
+
+  function classicoUS(a, r, t, pos) {
+    var tipo = a.us_classico;
+    if (tipo === 'hemorragico') {
+      if (pos && a.us_posmeno === 'tardia') {
+        r.recategorizar = true;
+        r.descr = 'cisto de aspecto hemorrágico em pós-menopausa tardia';
+        r.notas.push('Cisto hemorrágico não deve ocorrer na pós-menopausa tardia (≥ 5 anos): recategorize a lesão usando os demais descritores (opção "Outra lesão ovariana").');
+        return;
+      }
+      r.descr = 'cisto hemorrágico típico';
+      if (t >= 10) { r.cat = 3; r.conduta = CONDUTA3; return; }
+      r.cat = 2;
+      if (pos) r.conduta = 'Pós-menopausa precoce: US de controle em 2 a 3 meses; se não resolver ou o aspecto não for típico, especialista em US ou RM. Manejo clínico: ginecologista.';
+      else if (t <= 5) r.conduta = 'Nenhuma conduta adicional de imagem.';
+      else r.conduta = 'US de controle em 2 a 3 meses. Manejo clínico: ginecologista.';
+      return;
+    }
+    if (tipo === 'dermoide') {
+      r.descr = 'cisto dermoide típico';
+      if (t >= 10) { r.cat = 3; r.conduta = CONDUTA3; return; }
+      r.cat = 2;
+      r.conduta = t <= 3 ? 'Pode-se considerar ' + SEG12 + '. Manejo clínico: ginecologista.'
+        : 'Se não houver excisão cirúrgica, ' + SEG12 + '. Manejo clínico: ginecologista.';
+      return;
+    }
+    r.descr = 'endometrioma típico';
+    if (t >= 10) { r.cat = 3; r.conduta = CONDUTA3; return; }
+    r.cat = 2;
+    r.conduta = 'Se não houver excisão cirúrgica, ' + SEG12 + '. Manejo clínico: ginecologista.';
+    if (pos) r.notas.push('Endometrioma na pós-menopausa: há risco de transformação maligna; considerar avaliação por especialista em US ou RM e seguimento mais próximo.');
+  }
+
+  function outraUS(a, r, t, pos) {
+    var cs = Number(a.us_cs);
+    if (a.us_comp === 'solida') {
+      if (a.us_cext === 'irregular') {
+        r.cat = 5; r.descr = 'lesão sólida de contorno externo irregular'; r.conduta = CONDUTA5; return;
+      }
+      r.descr = 'lesão sólida de contorno externo liso, ' + (a.us_sombra === 'sim' ? 'com' : 'sem') + ' sombra acústica, ' + csTxt(cs);
+      if (cs === 4) { r.cat = 5; r.conduta = CONDUTA5; }
+      else if (cs === 1 || a.us_sombra === 'sim') {
+        r.cat = 3; r.conduta = CONDUTA3 + ' Por ser lesão sólida, pode-se considerar especialista em US ou RM (com escore O-RADS MRI).';
+      } else { r.cat = 4; r.conduta = CONDUTA4; }
+      return;
+    }
+    var loc = {uni: 'unilocular', bi: 'bilocular', multi: 'multilocular'}[a.us_loc];
+    if (a.us_comp === 'cist_solida') {
+      if (a.us_loc === 'uni') {
+        if (a.us_pp === '4mais') { r.cat = 5; r.descr = 'cisto unilocular com componente sólido (4 ou mais projeções papilares)'; r.conduta = CONDUTA5; }
+        else {
+          r.cat = 4; r.conduta = CONDUTA4;
+          r.descr = 'cisto unilocular com componente sólido (' + (a.us_pp === '1a3' ? '1 a 3 projeções papilares' : 'componente sólido não papilar') + ')';
+        }
+      } else {
+        r.descr = 'cisto ' + loc + ' com componente sólido, ' + csTxt(cs);
+        if (cs <= 2) { r.cat = 4; r.conduta = CONDUTA4; } else { r.cat = 5; r.conduta = CONDUTA5; }
+      }
+      return;
+    }
+    /* Cístico sem componente sólido */
+    var liso = a.us_cint === 'liso';
+    if (a.us_loc === 'uni') {
+      if (!liso) { r.cat = 3; r.descr = 'cisto unilocular de parede interna irregular (< 3 mm de altura)'; r.conduta = CONDUTA3; return; }
+      var simples = a.us_ecos === 'nenhum';
+      var compl = {ecos: 'com ecos internos', septos: 'com septações incompletas', ambos: 'com ecos internos e septações incompletas'}[a.us_ecos];
+      r.descr = simples ? 'cisto simples (unilocular, anecoico, de paredes lisas)' : 'cisto unilocular não simples, de paredes lisas, ' + compl;
+      if (t >= 10) { r.cat = 3; r.conduta = CONDUTA3; return; }
+      if (simples) {
+        if (!pos && t <= 3) {
+          r.cat = 1; r.descr = 'folículo (cisto simples ≤ 3 cm em paciente na pré-menopausa)'; r.conduta = 'Nenhuma conduta adicional de imagem.'; return;
+        }
+        r.cat = 2;
+        if (pos) r.conduta = t <= 3 ? 'Nenhuma conduta adicional de imagem.' : SEG12 + '.';
+        else r.conduta = t <= 5 ? 'Nenhuma conduta adicional de imagem.' : SEG12 + '.';
+        return;
+      }
+      r.cat = 2; r.conduta = naoSimples(t, pos); return;
+    }
+    if (a.us_loc === 'bi') {
+      if (!liso) { r.cat = 4; r.descr = 'cisto bilocular de paredes/septo irregulares, sem componente sólido'; r.conduta = CONDUTA4; return; }
+      r.descr = 'cisto bilocular de paredes e septo lisos, sem componente sólido';
+      if (t >= 10) { r.cat = 3; r.conduta = CONDUTA3; } else { r.cat = 2; r.conduta = naoSimples(t, pos); }
+      return;
+    }
+    if (!liso) { r.cat = 4; r.descr = 'cisto multilocular de paredes/septos irregulares, sem componente sólido'; r.conduta = CONDUTA4; return; }
+    r.descr = 'cisto multilocular de paredes e septos lisos, sem componente sólido, ' + csTxt(cs);
+    if (cs === 4 || t >= 10) { r.cat = 4; r.conduta = CONDUTA4; } else { r.cat = 3; r.conduta = CONDUTA3; }
+  }
+
+  function naoSimples(t, pos) {
+    if (t <= 3) return pos ? SEG12 + '.' : 'Nenhuma conduta adicional de imagem.';
+    return SEG6 + ' (se estável, considerar controles posteriores).';
+  }
+
+  /* ---------- RESSONÂNCIA (O-RADS MRI) ---------- */
+  function classificarRM(a) {
+    var r = {mod: 'RM', cat: null, descr: '', conduta: '', notas: []};
+    if (a.rm_tec === 'nao') { r.cat = 0; r.descr = 'exame incompleto ou tecnicamente inadequado para estratificação de risco'; return r; }
+    if (a.rm_perit === 'sim') {
+      r.cat = 5; r.descr = 'nodularidade ou espessamento irregular peritoneal, mesentérico ou omental, com ou sem ascite'; return r;
+    }
+    switch (a.rm_achado) {
+      case 'normal': r.cat = 1; r.descr = 'ovários de aspecto normal'; return r;
+      case 'fisio':
+        r.cat = 1;
+        r.descr = {foliculo: 'folículo (cisto simples ≤ 3 cm)', hemorragico: 'cisto hemorrágico ≤ 3 cm', luteo: 'corpo lúteo ≤ 3 cm, com ou sem hemorragia'}[a.rm_fisio] + ', em paciente na pré-menopausa';
+        return r;
+      case 'para':
+        r.cat = 2; r.descr = 'cisto paraovariano de parede fina e lisa, sem tecido sólido com realce'; return r;
+      case 'tuba':
+        var simples = a.rm_tuba_cont === 'simples', fina = a.rm_tuba_parede === 'fina';
+        r.descr = 'tuba uterina dilatada, com conteúdo ' + (simples ? 'líquido simples' : 'líquido não simples') + ' e parede/pregas ' + (fina ? 'finas' : 'espessas') + ' e lisas, sem tecido sólido com realce';
+        r.cat = (simples && fina) ? 2 : 3;
+        if (!simples && !fina) r.notas.push('A combinação de líquido não simples com parede espessa não está descrita explicitamente na tabela do O-RADS MRI; foi atribuída a categoria 3 como mínimo. Julgue caso a caso.');
+        return r;
+    }
+    /* Lesões císticas, císticas com tecido sólido e sólidas */
+    if (a.rm_lipid === 'sim') {
+      if (a.rm_lipid_solido === 'sim') { r.cat = 4; r.descr = 'lesão com conteúdo lipídico e grande volume de tecido sólido com realce'; }
+      else {
+        r.cat = 2; r.descr = 'lesão com conteúdo lipídico, sem tecido sólido com realce';
+        r.notas.push('Realce mínimo de nódulo de Rokitansky não altera a categoria.');
+      }
+      return r;
+    }
+    if (a.rm_achado === 'cisto') {
+      if (a.rm_estrutura === 'multi') {
+        r.cat = 3; r.descr = 'cisto multilocular, sem conteúdo lipídico, com paredes e septos lisos com realce, sem tecido sólido com realce'; return r;
+      }
+      var cont = {simples: 'líquido simples', hemorragico: 'líquido hemorrágico', endometriotico: 'líquido endometriótico', proteico: 'líquido proteináceo ou mucinoso'}[a.rm_conteudo];
+      if (a.rm_pequeno === 'sim') {
+        r.cat = 1;
+        r.descr = (a.rm_conteudo === 'simples' ? 'folículo (cisto simples ≤ 3 cm)' : 'cisto hemorrágico ≤ 3 cm') + ', em paciente na pré-menopausa';
+        return r;
+      }
+      if (a.rm_estrutura === 'uni_sem') {
+        r.cat = 2; r.descr = 'cisto unilocular com ' + cont + ', sem realce parietal e sem tecido sólido com realce'; return r;
+      }
+      r.descr = 'cisto unilocular com ' + cont + ', de parede lisa com realce, sem tecido sólido com realce';
+      r.cat = (a.rm_conteudo === 'simples' || a.rm_conteudo === 'endometriotico') ? 2 : 3;
+      return r;
+    }
+    /* Tecido sólido com realce */
+    var base = a.rm_achado === 'solida' ? 'lesão sólida' : 'lesão cística com tecido sólido com realce';
+    if (a.rm_dark === 'sim') {
+      r.cat = 2; r.descr = base + ', com tecido sólido homogeneamente hipointenso em T2 e na difusão ("dark T2/dark DWI")'; return r;
+    }
+    if (a.rm_tic === 'baixo') { r.cat = 3; r.descr = base + ', com curva intensidade-tempo de baixo risco'; return r; }
+    if (a.rm_mio === 'nao') {
+      r.cat = '4-5';
+      r.descr = base + (a.rm_tic === 'indisponivel' ? ', sem estudo dinâmico (DCE)' : ', com curva intensidade-tempo que não é de baixo risco') + ' e sem miométrio de referência';
+      r.notas.push('Sem miométrio externo confiável para comparação não é possível separar risco intermediário (4) de alto (5). Decida pelo conjunto dos achados.');
+      return r;
+    }
+    if (a.rm_tic === 'intermediario') { r.cat = 4; r.descr = base + ', com curva intensidade-tempo de risco intermediário'; return r; }
+    if (a.rm_tic === 'alto') { r.cat = 5; r.descr = base + ', com curva intensidade-tempo de alto risco'; return r; }
+    if (a.rm_naodce === 'menor') { r.cat = 4; r.descr = base + ', com realce menor ou igual ao do miométrio externo aos 30-40 s (sem DCE)'; }
+    else { r.cat = 5; r.descr = base + ', com realce maior que o do miométrio externo aos 30-40 s (sem DCE)'; }
+    return r;
+  }
+
+  /* ---------- Frase para o laudo ---------- */
+  function num(v) { return String(v).replace('.', ','); }
+
+  /* Na frase do laudo, cada linha é uma única sentença: vírgulas no meio, ponto só no final. */
+  function umaSentenca(linha) {
+    var s = linha.replace(/\.\s+(\S)(\S?)/g, function (m, c1, c2) {
+      var sigla = c2 && c2 === c2.toUpperCase() && c2 !== c2.toLowerCase();
+      return ', ' + (sigla ? c1 : c1.toLowerCase()) + c2;
+    });
+    return s.replace(/[.\s]+$/, '') + '.';
+  }
+
+  function fraseLaudo(r, a) {
+    var us = r.mod === 'US';
+    var lado = us ? a.us_lado : a.rm_lado, tam = us ? a.us_tam : a.rm_tam;
+    var ladoTxt = {dir: ' à direita', esq: ' à esquerda'}[lado] || '';
+    var linhas = [];
+    var achado = r.descr.charAt(0).toUpperCase() + r.descr.slice(1);
+    var semLesao = r.cat === 0 || (us ? (a.us_tipo === 'normal' || a.us_tipo === 'nao_visto') : (a.rm_achado === 'normal' || a.rm_perit === 'sim' || a.rm_tec === 'nao'));
+    if (!semLesao) {
+      achado = 'Região anexial' + (ladoTxt ? ladoTxt.replace(' à', '') : '') + ': ' + r.descr;
+      if (tam) achado += ', medindo ' + num(tam) + ' cm no maior diâmetro';
+    }
+    achado += '.';
+    if (us && (a.us_ascite || a.us_nodulos)) {
+      achado += ' ' + (a.us_ascite === 'sim' ? 'Ascite presente.' : 'Sem ascite.') + ' ' + (a.us_nodulos === 'sim' ? 'Nódulos peritoneais presentes.' : 'Sem nódulos peritoneais.');
+    }
+    linhas.push('Achados: ' + achado);
+    var sist = us ? 'O-RADS US' : 'O-RADS MRI', ref = us ? 'ACR O-RADS US v2022' : 'ACR O-RADS MRI';
+    if (r.cat === null) {
+      linhas.push('Impressão: ' + (r.naoAplicavel ? 'classificação O-RADS US não aplicável.' : 'lesão a ser recategorizada pelos demais descritores do O-RADS US.'));
+    } else {
+      var catTxt = r.cat === '4-5' ? '4 ou 5' : r.cat;
+      var nome = r.cat === '4-5' ? 'risco intermediário a alto' : (us ? NOME_US : NOME_RM)[r.cat];
+      var risco = r.cat === '4-5' ? '' : (us ? RISCO_US : VPP_RM)[r.cat];
+      var imp = 'Impressão: ' + sist + ' ' + catTxt + ' (' + nome;
+      if (risco && risco !== 'não se aplica') imp += '; ' + (us ? 'risco de malignidade ' : 'valor preditivo positivo para malignidade ') + risco;
+      imp += ').';
+      linhas.push(imp);
+      if (r.conduta) linhas.push('Conduta sugerida: ' + r.conduta);
+    }
+    linhas.push('Classificação conforme o sistema O-RADS™ do American College of Radiology (' + ref + ').');
+    return linhas.map(umaSentenca).join('\n');
+  }
+
+  var api = {classificarUS: classificarUS, classificarRM: classificarRM, fraseLaudo: fraseLaudo,
+    NOME_US: NOME_US, RISCO_US: RISCO_US, NOME_RM: NOME_RM, VPP_RM: VPP_RM};
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else raiz.ORADS = api;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+
+<script>
+/* Interface: perguntas em sequência; cada pergunta só aparece quando se aplica. */
+(function () {
+  'use strict';
+  var L = window.ORADS;
+  var SN = [['sim', 'Sim'], ['nao', 'Não']];
+  var CS = [['1', '1 (sem fluxo)'], ['2', '2 (fluxo mínimo)'], ['3', '3 (fluxo moderado)'], ['4', '4 (fluxo acentuado)']];
+  function us(a) { return a.mod === 'us' && a.us_tec === 'sim'; }
+  function usLesao(a) { return us(a) && (a.us_tipo === 'classico' || a.us_tipo === 'outra'); }
+  function usCist(a) { return us(a) && a.us_tipo === 'outra' && a.us_comp === 'cistica'; }
+  function rm(a) { return a.mod === 'rm' && a.rm_tec === 'sim' && a.rm_perit === 'nao'; }
+  function rmMassa(a) { return rm(a) && ['cisto', 'cist_solida', 'solida'].indexOf(a.rm_achado) >= 0; }
+  function rmSolido(a) { return rmMassa(a) && a.rm_achado !== 'cisto' && a.rm_lipid === 'nao' && a.rm_dark === 'nao'; }
+
+  var P = [
+    {id: 'mod', t: 'Qual o método de imagem?', o: [['us', 'Ultrassonografia (US)'], ['rm', 'Ressonância magnética (RM)']], v: function () { return true; }},
+
+    /* ---- US ---- */
+    {id: 'us_tec', t: 'O exame é tecnicamente adequado?', o: [['sim', 'Sim'], ['nao', 'Não: a lesão não pode ser caracterizada por fatores técnicos']], v: function (a) { return a.mod === 'us'; }},
+    {id: 'us_tipo', t: 'Qual o achado?', d: 'O-RADS US não se aplica a doença inflamatória pélvica, gestação ectópica, torção de ovário normal ou lesões claramente de origem uterina ou não ovariana/não tubária.',
+      o: [['normal', 'Ovário normal, sem lesão'], ['nao_visto', 'Ovário não visto ou ausente, sem lesão anexial'], ['fisio', 'Cisto fisiológico na pré-menopausa (folículo ou corpo lúteo ≤ 3 cm)'],
+        ['extra', 'Lesão extraovariana benigna típica (cisto paraovariano, cisto de inclusão peritoneal, hidrossalpinge)'], ['classico', 'Lesão ovariana benigna clássica (cisto hemorrágico, dermoide, endometrioma)'], ['outra', 'Outra lesão ovariana']], v: us},
+    {id: 'us_naovisto', t: 'Sobre o ovário não visualizado:', o: [['nao_exigido', 'Não visualizado; visualização não é exigida neste exame'], ['exigido', 'Não visualizado; visualização é necessária (ex.: rastreio de alto risco, controle de lesão conhecida)'], ['ausente', 'Ausente cirurgicamente']], v: function (a) { return us(a) && a.us_tipo === 'nao_visto'; }},
+    {id: 'us_fisio', t: 'Qual o cisto fisiológico?', d: 'Folículo: cisto simples ≤ 3 cm. Corpo lúteo: em geral ≤ 3 cm, de parede espessa e vascularização periférica.', o: [['foliculo', 'Folículo'], ['luteo', 'Corpo lúteo']], v: function (a) { return us(a) && a.us_tipo === 'fisio'; }},
+    {id: 'us_extra', t: 'Qual a lesão extraovariana?', o: [['para', 'Cisto paraovariano simples'], ['incl', 'Cisto de inclusão peritoneal'], ['hidro', 'Hidrossalpinge']], v: function (a) { return us(a) && a.us_tipo === 'extra'; }},
+    {id: 'us_classico', t: 'Qual a lesão benigna clássica?', d: 'Hemorrágico: unilocular, sem fluxo interno, padrão reticular e/ou coágulo retrátil. Dermoide: até 3 lóculos, sem fluxo interno, com componente hiperecoico com sombra, linhas/pontos hiperecoicos ou esferas ecogênicas flutuantes. Endometrioma: até 3 lóculos, sem fluxo interno, ecos homogêneos de baixa amplitude (vidro fosco), paredes/septos lisos.',
+      o: [['hemorragico', 'Cisto hemorrágico típico'], ['dermoide', 'Cisto dermoide típico'], ['endometrioma', 'Endometrioma típico']], v: function (a) { return us(a) && a.us_tipo === 'classico'; }},
+    {id: 'us_meno', t: 'Estado menopausal', d: 'Se incerto ou útero ausente, considerar pós-menopausa acima de 50 anos.', o: [['pre', 'Pré-menopausa'], ['pos', 'Pós-menopausa']], v: usLesao},
+    {id: 'us_posmeno', t: 'Há quanto tempo está na menopausa?', o: [['precoce', 'Precoce (< 5 anos)'], ['tardia', 'Tardia (≥ 5 anos)']], v: function (a) { return usLesao(a) && a.us_classico === 'hemorragico' && a.us_tipo === 'classico' && a.us_meno === 'pos'; }},
+    {id: 'us_tam', t: 'Maior diâmetro da lesão (cm)', d: 'Medido em qualquer plano.', n: true, v: usLesao},
+    {id: 'us_comp', t: 'Composição da lesão', d: 'Ecos internos e septações incompletas não são componente sólido. Componente sólido: projeção ≥ 3 mm de altura a partir da parede ou de um septo.',
+      o: [['cistica', 'Cística, sem componente sólido'], ['cist_solida', 'Cística, com componente sólido'], ['solida', 'Sólida (≥ 80% sólida)']], v: function (a) { return us(a) && a.us_tipo === 'outra'; }},
+    {id: 'us_loc', t: 'Número de lóculos', o: [['uni', '1 (unilocular)'], ['bi', '2 (bilocular)'], ['multi', '3 ou mais (multilocular)']], v: function (a) { return us(a) && a.us_tipo === 'outra' && (a.us_comp === 'cistica' || a.us_comp === 'cist_solida'); }},
+    {id: 'us_cint', t: 'Parede interna e septos', d: 'Irregular: espessamento focal da parede ou do septo com menos de 3 mm de altura.', o: [['liso', 'Lisos'], ['irregular', 'Irregulares']], v: usCist},
+    {id: 'us_ecos', t: 'Há ecos internos e/ou septações incompletas?', o: [['nenhum', 'Não (cisto simples, anecoico)'], ['ecos', 'Ecos internos'], ['septos', 'Septações incompletas'], ['ambos', 'Ambos']], v: function (a) { return usCist(a) && a.us_loc === 'uni' && a.us_cint === 'liso'; }},
+    {id: 'us_pp', t: 'Componente sólido: projeções papilares', d: 'Projeção papilar: componente sólido cercado por líquido em três lados.', o: [['1a3', '1 a 3 projeções papilares'], ['4mais', '4 ou mais projeções papilares'], ['nao_pp', 'Componente sólido não papilar']], v: function (a) { return us(a) && a.us_tipo === 'outra' && a.us_comp === 'cist_solida' && a.us_loc === 'uni'; }},
+    {id: 'us_cext', t: 'Contorno externo da lesão sólida', o: [['liso', 'Liso'], ['irregular', 'Irregular']], v: function (a) { return us(a) && a.us_tipo === 'outra' && a.us_comp === 'solida'; }},
+    {id: 'us_sombra', t: 'Há sombra acústica difusa ou ampla?', o: SN, v: function (a) { return us(a) && a.us_tipo === 'outra' && a.us_comp === 'solida' && a.us_cext === 'liso'; }},
+    {id: 'us_cs', t: 'Escore de cor (Doppler)', o: CS, v: function (a) {
+      if (!(us(a) && a.us_tipo === 'outra')) return false;
+      if (a.us_comp === 'solida') return a.us_cext === 'liso';
+      if (a.us_comp === 'cist_solida') return a.us_loc === 'bi' || a.us_loc === 'multi';
+      return a.us_comp === 'cistica' && a.us_loc === 'multi' && a.us_cint === 'liso';
+    }},
+    {id: 'us_ascite', t: 'Há ascite?', d: 'Para o O-RADS, ascite é líquido além do fundo de saco: acima do fundo uterino (útero antevertido) ou anterior e superior ao útero (útero retrovertido).', o: SN, v: function (a) { return usLesao(a) || (us(a) && a.us_tipo === 'extra'); }},
+    {id: 'us_nodulos', t: 'Há nódulos peritoneais?', o: SN, v: function (a) { return usLesao(a) || (us(a) && a.us_tipo === 'extra'); }},
+    {id: 'us_etiologia', t: 'Existe outra etiologia (maligna ou não) que explique a ascite e/ou os nódulos?', o: SN, v: function (a) { return us(a) && (a.us_ascite === 'sim' || a.us_nodulos === 'sim'); }},
+    {id: 'us_lado', t: 'Lateralidade (para o laudo)', op: true, o: [['dir', 'Direita'], ['esq', 'Esquerda']], v: function (a) { return us(a) && ['fisio', 'extra', 'classico', 'outra'].indexOf(a.us_tipo) >= 0; }},
+
+    /* ---- RM ---- */
+    {id: 'rm_tec', t: 'O exame de RM é tecnicamente adequado?', d: 'O-RADS MRI exige contraste (gadolínio) e sequências suficientes para caracterizar a lesão.', o: [['sim', 'Sim'], ['nao', 'Não: exame incompleto ou inadequado']], v: function (a) { return a.mod === 'rm'; }},
+    {id: 'rm_perit', t: 'Há nodularidade ou espessamento irregular peritoneal, mesentérico ou omental (com ou sem ascite)?', o: SN, v: function (a) { return a.mod === 'rm' && a.rm_tec === 'sim'; }},
+    {id: 'rm_achado', t: 'Qual o achado?', d: 'Tecido sólido: componente com realce, como projeção papilar, nódulo mural, parede/septo irregular ou porção sólida maior. Lesão sólida: ao menos 80% de tecido sólido.',
+      o: [['normal', 'Ovários normais, sem lesão'], ['fisio', 'Achado fisiológico na pré-menopausa (folículo, cisto hemorrágico ou corpo lúteo ≤ 3 cm)'], ['cisto', 'Lesão cística, sem tecido sólido com realce'],
+        ['cist_solida', 'Lesão cística com tecido sólido'], ['solida', 'Lesão sólida (≥ 80% de tecido sólido)'], ['tuba', 'Tuba uterina dilatada, sem lesão sólida'], ['para', 'Cisto paraovariano']], v: rm},
+    {id: 'rm_fisio', t: 'Qual o achado fisiológico?', o: [['foliculo', 'Folículo'], ['hemorragico', 'Cisto hemorrágico ≤ 3 cm'], ['luteo', 'Corpo lúteo']], v: function (a) { return rm(a) && a.rm_achado === 'fisio'; }},
+    {id: 'rm_tuba_cont', t: 'Conteúdo da tuba', d: 'Líquido simples: acompanha o líquor/urina em todas as sequências (hiperintenso em T2, hipointenso em T1).', o: [['simples', 'Líquido simples'], ['nao_simples', 'Líquido não simples']], v: function (a) { return rm(a) && a.rm_achado === 'tuba'; }},
+    {id: 'rm_tuba_parede', t: 'Parede e pregas endossalpingeanas', d: 'Não aplicar o O-RADS MRI a tuba dilatada com sintomas agudos quando há suspeita de doença inflamatória pélvica/piossalpinge.', o: [['fina', 'Finas e lisas'], ['espessa', 'Espessas e lisas']], v: function (a) { return rm(a) && a.rm_achado === 'tuba'; }},
+    {id: 'rm_lipid', t: 'A lesão contém gordura (lipídio)?', d: 'Hiperintensa em T1 com queda de sinal nas sequências com saturação de gordura.', o: SN, v: rmMassa},
+    {id: 'rm_lipid_solido', t: 'Há grande volume de tecido sólido com realce, não compatível com nódulo de Rokitansky?', o: SN, v: function (a) { return rmMassa(a) && a.rm_lipid === 'sim'; }},
+    {id: 'rm_estrutura', t: 'Estrutura do cisto', o: [['uni_sem', 'Unilocular, sem realce da parede'], ['uni_com', 'Unilocular, com parede lisa com realce'], ['multi', 'Multilocular']], v: function (a) { return rmMassa(a) && a.rm_achado === 'cisto' && a.rm_lipid === 'nao'; }},
+    {id: 'rm_conteudo', t: 'Conteúdo do cisto', o: [['simples', 'Líquido simples'], ['hemorragico', 'Hemorrágico'], ['endometriotico', 'Endometriótico'], ['proteico', 'Proteináceo ou mucinoso']], v: function (a) { return rmMassa(a) && a.rm_achado === 'cisto' && a.rm_lipid === 'nao' && (a.rm_estrutura === 'uni_sem' || a.rm_estrutura === 'uni_com'); }},
+    {id: 'rm_pequeno', t: 'É um cisto ≤ 3 cm em paciente na pré-menopausa?', o: [['sim', 'Sim'], ['nao', 'Não (> 3 cm e/ou pós-menopausa)']], v: function (a) { return rmMassa(a) && a.rm_achado === 'cisto' && a.rm_lipid === 'nao' && (a.rm_estrutura === 'uni_sem' || a.rm_estrutura === 'uni_com') && (a.rm_conteudo === 'simples' || a.rm_conteudo === 'hemorragico'); }},
+    {id: 'rm_dark', t: 'O tecido sólido é homogeneamente hipointenso em T2 e na difusão ("dark T2/dark DWI")?', o: SN, v: function (a) { return rmMassa(a) && a.rm_achado !== 'cisto' && a.rm_lipid === 'nao'; }},
+    {id: 'rm_tic', t: 'Curva intensidade-tempo do tecido sólido (DCE)', d: 'Baixo risco: realce gradual, sem ombro nem platô. Intermediário: inclinação inicial menor ou igual à do miométrio, com ombro e platô. Alto: inclinação inicial maior que a do miométrio, com ombro e platô.',
+      o: [['baixo', 'Baixo risco'], ['intermediario', 'Risco intermediário'], ['alto', 'Alto risco'], ['indisponivel', 'DCE não disponível']], v: rmSolido},
+    {id: 'rm_mio', t: 'Há miométrio externo adequado para comparação?', o: [['sim', 'Sim'], ['nao', 'Não: útero ausente ou sem referência confiável']], v: function (a) { return rmSolido(a) && a.rm_tic && a.rm_tic !== 'baixo'; }},
+    {id: 'rm_naodce', t: 'Realce do tecido sólido aos 30-40 s após o contraste (sem DCE)', o: [['menor', 'Menor ou igual ao do miométrio externo'], ['maior', 'Maior que o do miométrio externo']], v: function (a) { return rmSolido(a) && a.rm_tic === 'indisponivel' && a.rm_mio === 'sim'; }},
+    {id: 'rm_lado', t: 'Lateralidade (para o laudo)', op: true, o: [['dir', 'Direita'], ['esq', 'Esquerda']], v: function (a) { return rm(a) && a.rm_achado && a.rm_achado !== 'normal'; }},
+    {id: 'rm_tam', t: 'Maior diâmetro da lesão (cm), para o laudo', op: true, n: true, v: function (a) { return rm(a) && a.rm_achado && a.rm_achado !== 'normal'; }}
+  ];
+
+  var form = document.getElementById('oc-form'), saida = document.getElementById('oc-resultado');
+  var bruto = {};
+
+  function el(tag, attrs, txt) {
+    var e = document.createElement(tag), k;
+    for (k in attrs) e.setAttribute(k, attrs[k]);
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+
+  P.forEach(function (p) {
+    var fs = el('fieldset', {'data-q': p.id, hidden: ''});
+    fs.appendChild(el('legend', {}, p.t + (p.op ? ' (opcional)' : '')));
+    if (p.d) fs.appendChild(el('p', {'class': 'oc-dica'}, p.d));
+    if (p.n) {
+      fs.appendChild(el('input', {type: 'text', inputmode: 'decimal', 'class': 'oc-num', name: p.id, placeholder: 'ex.: 4,5', 'aria-label': p.t}));
+    } else {
+      var box = el('div', {'class': 'oc-opcoes'});
+      p.o.forEach(function (o) {
+        var lb = el('label');
+        lb.appendChild(el('input', {type: 'radio', name: p.id, value: o[0]}));
+        lb.appendChild(el('span', {}, o[1]));
+        box.appendChild(lb);
+      });
+      fs.appendChild(box);
+    }
+    form.appendChild(fs);
+  });
+
+  function lerNumero(s) {
+    var x = parseFloat(String(s).replace(',', '.'));
+    return isFinite(x) && x > 0 && x < 100 ? x : undefined;
+  }
+
+  function atualizar() {
+    var a = {}, completo = true;
+    P.forEach(function (p) {
+      var fs = form.querySelector('[data-q="' + p.id + '"]');
+      var vis = !!p.v(a);
+      fs.hidden = !vis;
+      if (!vis) return;
+      var val = bruto[p.id];
+      if (p.n) val = lerNumero(val);
+      if (val === undefined || val === '') { if (!p.op) completo = false; return; }
+      a[p.id] = val;
+    });
+    mostrar(a, completo);
+  }
+
+  function mostrar(a, completo) {
+    saida.textContent = '';
+    if (!a.mod || !completo) {
+      saida.appendChild(el('p', {'class': 'oc-pendente'}, 'Responda às perguntas acima para ver a categoria O-RADS e a frase para o laudo.'));
+      return;
+    }
+    var us = a.mod === 'us';
+    var r = us ? L.classificarUS(a) : L.classificarRM(a);
+    var sist = us ? 'O-RADS US' : 'O-RADS MRI';
+    if (r.cat === null) {
+      saida.appendChild(el('span', {'class': 'oc-cat oc-c0'}, r.naoAplicavel ? sist + ' não aplicável' : 'Recategorizar a lesão'));
+    } else {
+      var cls = r.cat === '4-5' ? 'oc-c4' : 'oc-c' + r.cat;
+      saida.appendChild(el('span', {'class': 'oc-cat ' + cls}, sist + ' ' + (r.cat === '4-5' ? '4 ou 5' : r.cat)));
+      var nome = r.cat === '4-5' ? 'risco intermediário a alto' : (us ? L.NOME_US : L.NOME_RM)[r.cat];
+      var risco = r.cat === '4-5' ? 'cerca de 50% a 90%' : (us ? L.RISCO_US : L.VPP_RM)[r.cat];
+      saida.appendChild(el('p', {'class': 'oc-linha'}, 'Categoria: ' + nome + '. ' + (us ? 'Risco de malignidade: ' : 'Valor preditivo positivo para malignidade: ') + risco + '.'));
+    }
+    saida.appendChild(el('p', {'class': 'oc-linha'}, 'Descritor: ' + r.descr + '.'));
+    if (r.conduta) saida.appendChild(el('p', {'class': 'oc-linha'}, 'Conduta sugerida (ACR): ' + r.conduta));
+    r.notas.forEach(function (n) { saida.appendChild(el('p', {'class': 'oc-nota'}, n)); });
+
+    saida.appendChild(el('p', {'class': 'oc-linha'}, 'Frase para o laudo (editável):'));
+    var ta = el('textarea', {'class': 'oc-laudo', 'aria-label': 'Frase para o laudo'});
+    ta.value = L.fraseLaudo(r, a);
+    saida.appendChild(ta);
+    var ac = el('div', {'class': 'oc-acoes'});
+    var bt = el('button', {type: 'button', 'class': 'oc-botao'}, 'Copiar frase');
+    var ok = el('span', {'class': 'oc-ok', role: 'status'});
+    bt.addEventListener('click', function () {
+      function feito() { ok.textContent = 'Copiado!'; setTimeout(function () { ok.textContent = ''; }, 2500); }
+      function reserva() { ta.select(); try { document.execCommand('copy'); feito(); } catch (e) { ok.textContent = 'Selecione o texto e copie (Ctrl+C).'; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(feito, reserva); else reserva();
+    });
+    ac.appendChild(bt); ac.appendChild(ok);
+    saida.appendChild(ac);
+  }
+
+  form.addEventListener('change', function (e) { if (e.target.name) { bruto[e.target.name] = e.target.value; atualizar(); } });
+  form.addEventListener('input', function (e) { if (e.target.type === 'text') { bruto[e.target.name] = e.target.value; atualizar(); } });
+  document.getElementById('oc-limpar').addEventListener('click', function () { bruto = {}; form.reset(); atualizar(); });
+  atualizar();
+})();
+</script>
+<!-- FIM DO BLOCO -->
+</body>
+</html>

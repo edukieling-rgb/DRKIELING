@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora ACR TI-RADS</title>
+</head>
+<body>
+<!--
+  Calculadora ACR TI-RADS - Exames Lajeado
+  Código original. Roda inteiramente no navegador: não envia, não grava e não coleta nenhum dado.
+  Para colar no WordPress: copie tudo entre "INÍCIO DO BLOCO" e "FIM DO BLOCO" em um bloco "HTML personalizado".
+-->
+<!-- INÍCIO DO BLOCO -->
+<style>
+.tirads-calc{--verde:#33b458;--verde-esc:#2da54f;--grafite:#3d3d41;--cinza:#efefef;--borda:#d7d7d7;
+  max-width:860px;margin:0 auto;padding:16px;font-family:inherit;color:var(--grafite);line-height:1.45;box-sizing:border-box}
+.tirads-calc *{box-sizing:border-box}
+.tirads-calc h2{font-size:26px;margin:0 0 6px;font-weight:800}
+.tirads-calc .oc-sub{margin:0 0 18px;font-size:15px}
+.tirads-calc .oc-painel{background:var(--cinza);border-radius:5px;padding:20px}
+.tirads-calc fieldset{border:0;margin:0 0 18px;padding:0;min-width:0}
+.tirads-calc legend{font-weight:700;font-size:16px;padding:0;margin-bottom:4px}
+.tirads-calc .oc-dica{font-size:13.5px;margin:0 0 8px;color:#55555a}
+.tirads-calc .oc-opcoes{display:flex;flex-wrap:wrap;gap:8px}
+.tirads-calc .oc-opcoes label{position:relative;cursor:pointer}
+.tirads-calc .oc-opcoes input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.tirads-calc .oc-opcoes span{display:block;background:#fff;border:2px solid var(--borda);border-radius:5px;padding:9px 14px;font-size:14.5px;font-weight:600;transition:.15s}
+.tirads-calc .oc-opcoes input:checked+span{background:var(--verde);border-color:var(--verde-esc);color:#fff}
+.tirads-calc .oc-opcoes input:focus-visible+span{outline:3px solid #007aff;outline-offset:2px}
+.tirads-calc .oc-num{width:140px;padding:10px 12px;border:2px solid var(--borda);border-radius:5px;font-size:16px;font-family:inherit}
+.tirads-calc .oc-botao{background:var(--grafite);color:#fff;border:0;border-radius:5px;padding:12px 26px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+.tirads-calc .oc-botao:hover{background:#000}
+.tirads-calc .oc-botao.oc-claro{background:#fff;color:var(--grafite);border:2px solid var(--borda)}
+.tirads-calc .oc-resultado{margin-top:20px;border-radius:5px;border:2px solid var(--borda);background:#fff;padding:18px}
+.tirads-calc .oc-pendente{color:#55555a;font-size:14.5px;margin:0}
+.tirads-calc .oc-cat{display:inline-block;border-radius:5px;padding:8px 16px;font-weight:800;font-size:22px;color:#fff;background:var(--grafite)}
+.tirads-calc .oc-c0{background:#6b6b70}.tirads-calc .oc-c1{background:#2da54f}.tirads-calc .oc-c2{background:#33b458}
+.tirads-calc .oc-c3{background:#d9a400}.tirads-calc .oc-c4{background:#e67700}.tirads-calc .oc-c5{background:#d6263c}
+.tirads-calc .oc-linha{margin:10px 0 0;font-size:15px}
+.tirads-calc .oc-nota{background:#fff4f4;border-left:4px solid #ff5268;padding:8px 12px;margin:10px 0 0;font-size:14px}
+.tirads-calc .oc-laudo{width:100%;min-height:150px;margin-top:8px;padding:12px;border:2px solid var(--borda);border-radius:5px;font-family:inherit;font-size:15px;line-height:1.45;resize:vertical}
+.tirads-calc .oc-acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.tirads-calc .oc-ok{font-size:14px;color:var(--verde-esc);font-weight:700}
+.tirads-calc .oc-rodape{font-size:12.5px;color:#55555a;margin-top:18px}
+.tirads-calc .oc-rodape p{margin:0 0 6px}
+.tirads-calc [hidden]{display:none!important}
+.tirads-calc .oc-pontos{margin:8px 0 0;padding-left:20px;font-size:14.5px}
+</style>
+
+<div class="tirads-calc" id="tirads-calc">
+  <h2>Calculadora ACR TI-RADS</h2>
+  <p class="oc-sub">Classificação de nódulos de tireoide à ultrassonografia (ACR TI-RADS), com pontuação, conduta por tamanho e frase pronta para o laudo. Ferramenta de apoio para médicos: nada é enviado ou armazenado.</p>
+  <div class="oc-painel">
+    <form id="tc-form" autocomplete="off" onsubmit="return false"></form>
+    <div class="oc-acoes"><button type="button" class="oc-botao oc-claro" id="tc-limpar">Recomeçar</button></div>
+  </div>
+  <div class="oc-resultado" id="tc-resultado" aria-live="polite"></div>
+  <div class="oc-rodape">
+    <p><strong>Fonte:</strong> ACR TI-RADS™ (Thyroid Imaging Reporting and Data System) é um sistema do American College of Radiology (ACR). Critérios baseados em: Tessler FN et al., ACR Thyroid Imaging, Reporting and Data System (TI-RADS): White Paper of the ACR TI-RADS Committee, <em>J Am Coll Radiol</em> 2017;14(5):587-595; Grant EG et al., Thyroid Ultrasound Reporting Lexicon, <em>J Am Coll Radiol</em> 2015;12(12):1272-1279. Consulte a tabela oficial em acr.org.</p>
+    <p>Esta calculadora é independente, não é produzida nem endossada pelo ACR, e não substitui o julgamento do médico. As condutas valem para adultos e devem considerar fatores de risco, linfonodos suspeitos e o contexto clínico. Confira sempre o resultado antes de usar no laudo.</p>
+  </div>
+</div>
+
+<script id="tirads-logic">
+/* Lógica pura do ACR TI-RADS (sem acesso à página). Usada pela interface e pelos testes. */
+(function (raiz) {
+  'use strict';
+  var COMP = {cistico: [0, 'cístico ou quase completamente cístico'], espongiforme: [0, 'espongiforme'],
+    misto: [1, 'misto, cístico e sólido'], solido: [2, 'sólido ou quase completamente sólido'], indet: [2, 'de composição não determinável por calcificação']};
+  var ECO = {anecoico: [0, 'anecoico'], hiper_iso: [1, 'hiperecoico ou isoecoico'], hipo: [2, 'hipoecoico'],
+    muito_hipo: [3, 'muito hipoecoico'], indet: [1, 'de ecogenicidade não determinável']};
+  var FORMA = {largo: [0, 'mais largo que alto'], alto: [3, 'mais alto que largo']};
+  var MARGEM = {lisa: [0, 'margens lisas'], mal_definida: [0, 'margens mal definidas'], lobulada: [2, 'margens lobuladas ou irregulares'],
+    extensao: [3, 'extensão extratireoidiana'], indet: [0, 'margens não determináveis']};
+  var FOCOS = {nenhum: [0, 'sem focos ecogênicos ou apenas com artefatos em cauda de cometa grandes'], macro: [1, 'macrocalcificações'],
+    periferica: [2, 'calcificações periféricas (em anel)'], puntiforme: [3, 'focos ecogênicos puntiformes']};
+  var NIVEL = {1: 'benigno', 2: 'não suspeito', 3: 'levemente suspeito', 4: 'moderadamente suspeito', 5: 'altamente suspeito'};
+  var RISCO = {1: '< 2%', 2: '< 2%', 3: '< 5%', 4: '5% a 20%', 5: '> 20%'};
+  /* [PAAF a partir de (cm), seguimento a partir de (cm), intervalos de seguimento] */
+  var LIMIAR = {3: [2.5, 1.5, 'em 1, 3 e 5 anos'], 4: [1.5, 1.0, 'em 1, 2, 3 e 5 anos'], 5: [1.0, 0.5, 'anual, por até 5 anos']};
+
+  function num(v) { return String(v).replace('.', ','); }
+
+  function classificar(a) {
+    var r = {pontos: 0, partes: [], notas: [], tr: 1, conduta: ''};
+    var focos = (a.focos || []).filter(function (f) { return f !== 'nenhum'; });
+    if (a.comp === 'espongiforme') {
+      r.partes.push(['Composição', COMP.espongiforme[1], 0]);
+      r.notas.push('Nódulo espongiforme: não se somam pontos das demais categorias (TR1).');
+      r.descr = 'nódulo espongiforme';
+    } else {
+      var c = COMP[a.comp], e = ECO[a.eco], f = FORMA[a.forma], m = MARGEM[a.margem];
+      r.partes.push(['Composição', c[1], c[0]], ['Ecogenicidade', e[1], e[0]], ['Forma', f[1], f[0]], ['Margem', m[1], m[0]]);
+      var pf = 0, tf = [];
+      focos.forEach(function (k) { pf += FOCOS[k][0]; tf.push(FOCOS[k][1]); });
+      if (!focos.length) tf.push(FOCOS.nenhum[1]);
+      r.partes.push(['Focos ecogênicos', tf.join(' e '), pf]);
+      r.pontos = c[0] + e[0] + f[0] + m[0] + pf;
+      r.descr = 'nódulo ' + c[1] + ', ' + e[1] + ', ' + f[1] + ', com ' + m[1] + ', ' + (focos.length ? 'com ' : '') + tf.join(' e ');
+    }
+    var p = r.pontos;
+    r.tr = p <= 1 ? 1 : p === 2 ? 2 : p === 3 ? 3 : p <= 6 ? 4 : 5;
+    if (p === 1) r.notas.push('A tabela do ACR não lista o total de 1 ponto; por convenção foi classificado como TR1.');
+    if (a.margem === 'extensao') r.notas.push('Extensão extratireoidiana evidente é altamente sugestiva de malignidade, independentemente da pontuação.');
+    var t = a.tam;
+    if (r.tr <= 2) r.conduta = 'Sem indicação de PAAF e sem necessidade de seguimento ultrassonográfico.';
+    else {
+      var L = LIMIAR[r.tr];
+      if (t >= L[0]) r.conduta = 'PAAF indicada (nódulo ≥ ' + num(L[0].toFixed(1)) + ' cm).';
+      else if (t >= L[1]) r.conduta = 'Seguimento ultrassonográfico ' + L[2] + ' (nódulo ≥ ' + num(L[1].toFixed(1)) + ' cm e < ' + num(L[0].toFixed(1)) + ' cm); sem indicação de PAAF no momento.';
+      else r.conduta = 'Sem indicação de PAAF ou de seguimento pelo tamanho (nódulo < ' + num(L[1].toFixed(1)) + ' cm).';
+    }
+    return r;
+  }
+
+  /* Na frase do laudo, cada linha é uma única sentença: vírgulas no meio, ponto só no final. */
+  function umaSentenca(linha) {
+    var s = linha.replace(/\.\s+(\S)(\S?)/g, function (m, c1, c2) {
+      var sigla = c2 && c2 === c2.toUpperCase() && c2 !== c2.toLowerCase();
+      return ', ' + (sigla ? c1 : c1.toLowerCase()) + c2;
+    });
+    return s.replace(/[.\s]+$/, '') + '.';
+  }
+
+  function fraseLaudo(r, a) {
+    var onde = {ld: ' no lobo direito', le: ' no lobo esquerdo', istmo: ' no istmo'}[a.local] || '';
+    var d = r.descr.charAt(0).toUpperCase() + r.descr.slice(1);
+    var i = d.indexOf(' ');
+    d = d.slice(0, i) + onde + (onde ? ',' : '') + d.slice(i);
+    return ['Achados: ' + d + ', medindo ' + num(a.tam) + ' cm no maior diâmetro.',
+      'Impressão: ACR TI-RADS ' + r.tr + ' (TR' + r.tr + ', ' + NIVEL[r.tr] + '; ' + r.pontos + (r.pontos === 1 ? ' ponto' : ' pontos') + ').',
+      'Conduta sugerida: ' + r.conduta,
+      'Classificação conforme o sistema ACR TI-RADS™ do American College of Radiology (ACR).'].map(umaSentenca).join('\n');
+  }
+
+  var api = {classificar: classificar, fraseLaudo: fraseLaudo, NIVEL: NIVEL, RISCO: RISCO,
+    opcoes: {comp: COMP, eco: ECO, forma: FORMA, margem: MARGEM, focos: FOCOS}};
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else raiz.TIRADS = api;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var L = window.TIRADS, O = L.opcoes;
+  function pts(n) { return ' (' + n + (n === 1 ? ' ponto)' : ' pontos)'); }
+  function lista(tab, rot) { return Object.keys(tab).map(function (k) { return [k, rot[k] + pts(tab[k][0])]; }); }
+  var P = [
+    {id: 'comp', t: 'Composição', d: 'Espongiforme: composto predominantemente (> 50%) por pequenos espaços císticos. Escolha uma opção.',
+      o: lista(O.comp, {cistico: 'Cístico ou quase completamente cístico', espongiforme: 'Espongiforme', misto: 'Misto, cístico e sólido', solido: 'Sólido ou quase completamente sólido', indet: 'Não determinável por calcificação'})},
+    {id: 'eco', t: 'Ecogenicidade', d: 'Em relação ao parênquima tireoidiano. Muito hipoecoico: mais hipoecoico que a musculatura pré-tireoidiana.', esp: true,
+      o: lista(O.eco, {anecoico: 'Anecoico', hiper_iso: 'Hiperecoico ou isoecoico', hipo: 'Hipoecoico', muito_hipo: 'Muito hipoecoico', indet: 'Não determinável'})},
+    {id: 'forma', t: 'Forma', d: 'Avaliada no plano transversal: diâmetro anteroposterior comparado ao transverso.', esp: true,
+      o: lista(O.forma, {largo: 'Mais largo que alto', alto: 'Mais alto que largo'})},
+    {id: 'margem', t: 'Margem', esp: true,
+      o: lista(O.margem, {lisa: 'Lisa', mal_definida: 'Mal definida', lobulada: 'Lobulada ou irregular', extensao: 'Extensão extratireoidiana', indet: 'Não determinável'})},
+    {id: 'focos', t: 'Focos ecogênicos', d: 'Marque todos os que se aplicam; os pontos se somam.', esp: true, multi: true,
+      o: lista(O.focos, {nenhum: 'Nenhum ou artefatos em cauda de cometa grandes', macro: 'Macrocalcificações', periferica: 'Calcificações periféricas (em anel)', puntiforme: 'Focos ecogênicos puntiformes'})},
+    {id: 'tam', t: 'Maior diâmetro do nódulo (cm)', n: true},
+    {id: 'local', t: 'Localização (para o laudo)', op: true, o: [['ld', 'Lobo direito'], ['le', 'Lobo esquerdo'], ['istmo', 'Istmo']]}
+  ];
+  var form = document.getElementById('tc-form'), saida = document.getElementById('tc-resultado');
+  function el(tag, attrs, txt) { var e = document.createElement(tag), k; for (k in attrs) e.setAttribute(k, attrs[k]); if (txt != null) e.textContent = txt; return e; }
+  P.forEach(function (p) {
+    var fs = el('fieldset', {'data-q': p.id});
+    fs.appendChild(el('legend', {}, p.t + (p.op ? ' (opcional)' : '')));
+    if (p.d) fs.appendChild(el('p', {'class': 'oc-dica'}, p.d));
+    if (p.n) fs.appendChild(el('input', {type: 'text', inputmode: 'decimal', 'class': 'oc-num', name: p.id, placeholder: 'ex.: 1,8', 'aria-label': p.t}));
+    else {
+      var box = el('div', {'class': 'oc-opcoes'});
+      p.o.forEach(function (o) {
+        var lb = el('label');
+        lb.appendChild(el('input', {type: p.multi ? 'checkbox' : 'radio', name: p.id, value: o[0]}));
+        lb.appendChild(el('span', {}, o[1]));
+        box.appendChild(lb);
+      });
+      fs.appendChild(box);
+    }
+    form.appendChild(fs);
+  });
+  function ler() {
+    var a = {focos: []};
+    Array.prototype.forEach.call(form.elements, function (i) {
+      if (!i.name) return;
+      if (i.type === 'radio') { if (i.checked) a[i.name] = i.value; }
+      else if (i.type === 'checkbox') { if (i.checked) a.focos.push(i.value); }
+      else { var x = parseFloat(i.value.replace(',', '.')); if (isFinite(x) && x > 0 && x < 30) a[i.name] = x; }
+    });
+    return a;
+  }
+  function atualizar() {
+    var a = ler(), esp = a.comp === 'espongiforme';
+    P.forEach(function (p) { if (p.esp) form.querySelector('[data-q="' + p.id + '"]').hidden = esp; });
+    saida.textContent = '';
+    var ok = a.comp && a.tam && (esp || (a.eco && a.forma && a.margem && a.focos.length));
+    if (!ok) { saida.appendChild(el('p', {'class': 'oc-pendente'}, 'Preencha as características e o tamanho do nódulo para ver a categoria TI-RADS e a frase para o laudo.')); return; }
+    var r = L.classificar(a);
+    saida.appendChild(el('span', {'class': 'oc-cat oc-c' + r.tr}, 'ACR TI-RADS ' + r.tr + ' (TR' + r.tr + ')'));
+    saida.appendChild(el('p', {'class': 'oc-linha'}, 'Total: ' + r.pontos + (r.pontos === 1 ? ' ponto' : ' pontos') + '. Categoria: ' + L.NIVEL[r.tr] + '. Risco estimado de malignidade: ' + L.RISCO[r.tr] + '.'));
+    var ul = el('ul', {'class': 'oc-pontos'});
+    r.partes.forEach(function (x) { ul.appendChild(el('li', {}, x[0] + ': ' + x[1] + ' = ' + x[2])); });
+    saida.appendChild(ul);
+    saida.appendChild(el('p', {'class': 'oc-linha'}, 'Conduta sugerida (ACR): ' + r.conduta));
+    r.notas.forEach(function (n) { saida.appendChild(el('p', {'class': 'oc-nota'}, n)); });
+    saida.appendChild(el('p', {'class': 'oc-linha'}, 'Frase para o laudo (editável):'));
+    var ta = el('textarea', {'class': 'oc-laudo', 'aria-label': 'Frase para o laudo'});
+    ta.value = L.fraseLaudo(r, a);
+    saida.appendChild(ta);
+    var ac = el('div', {'class': 'oc-acoes'}), bt = el('button', {type: 'button', 'class': 'oc-botao'}, 'Copiar frase'), okm = el('span', {'class': 'oc-ok', role: 'status'});
+    bt.addEventListener('click', function () {
+      function feito() { okm.textContent = 'Copiado!'; setTimeout(function () { okm.textContent = ''; }, 2500); }
+      function reserva() { ta.select(); try { document.execCommand('copy'); feito(); } catch (e) { okm.textContent = 'Selecione o texto e copie (Ctrl+C).'; } }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(feito, reserva); else reserva();
+    });
+    ac.appendChild(bt); ac.appendChild(okm); saida.appendChild(ac);
+  }
+  form.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.name === 'focos' && t.checked) {
+      Array.prototype.forEach.call(form.querySelectorAll('input[name="focos"]'), function (i) {
+        if (i !== t && (t.value === 'nenhum' || i.value === 'nenhum')) i.checked = false;
+      });
+    }
+    atualizar();
+  });
+  form.addEventListener('input', function (e) { if (e.target.type === 'text') atualizar(); });
+  document.getElementById('tc-limpar').addEventListener('click', function () { form.reset(); atualizar(); });
+  atualizar();
+})();
+</script>
+<!-- FIM DO BLOCO -->
+</body>
+</html>
