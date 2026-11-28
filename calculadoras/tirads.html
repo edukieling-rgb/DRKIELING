@@ -114,6 +114,15 @@
     return r;
   }
 
+  /* Na frase do laudo, cada linha é uma única sentença: vírgulas no meio, ponto só no final. */
+  function umaSentenca(linha) {
+    var s = linha.replace(/\.\s+(\S)(\S?)/g, function (m, c1, c2) {
+      var sigla = c2 && c2 === c2.toUpperCase() && c2 !== c2.toLowerCase();
+      return ', ' + (sigla ? c1 : c1.toLowerCase()) + c2;
+    });
+    return s.replace(/[.\s]+$/, '') + '.';
+  }
+
   function fraseLaudo(r, a) {
     var onde = {ld: ' no lobo direito', le: ' no lobo esquerdo', istmo: ' no istmo'}[a.local] || '';
     var d = r.descr.charAt(0).toUpperCase() + r.descr.slice(1);
@@ -122,7 +131,7 @@
     return ['Achados: ' + d + ', medindo ' + num(a.tam) + ' cm no maior diâmetro.',
       'Impressão: ACR TI-RADS ' + r.tr + ' (TR' + r.tr + ', ' + NIVEL[r.tr] + '; ' + r.pontos + (r.pontos === 1 ? ' ponto' : ' pontos') + ').',
       'Conduta sugerida: ' + r.conduta,
-      'Classificação conforme o sistema ACR TI-RADS™ do American College of Radiology (ACR).'].join('\n');
+      'Classificação conforme o sistema ACR TI-RADS™ do American College of Radiology (ACR).'].map(umaSentenca).join('\n');
   }
 
   var api = {classificar: classificar, fraseLaudo: fraseLaudo, NIVEL: NIVEL, RISCO: RISCO,

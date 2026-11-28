@@ -304,6 +304,15 @@
   /* ---------- Frase para o laudo ---------- */
   function num(v) { return String(v).replace('.', ','); }
 
+  /* Na frase do laudo, cada linha é uma única sentença: vírgulas no meio, ponto só no final. */
+  function umaSentenca(linha) {
+    var s = linha.replace(/\.\s+(\S)(\S?)/g, function (m, c1, c2) {
+      var sigla = c2 && c2 === c2.toUpperCase() && c2 !== c2.toLowerCase();
+      return ', ' + (sigla ? c1 : c1.toLowerCase()) + c2;
+    });
+    return s.replace(/[.\s]+$/, '') + '.';
+  }
+
   function fraseLaudo(r, a) {
     var us = r.mod === 'US';
     var lado = us ? a.us_lado : a.rm_lado, tam = us ? a.us_tam : a.rm_tam;
@@ -334,7 +343,7 @@
       if (r.conduta) linhas.push('Conduta sugerida: ' + r.conduta);
     }
     linhas.push('Classificação conforme o sistema O-RADS™ do American College of Radiology (' + ref + ').');
-    return linhas.join('\n');
+    return linhas.map(umaSentenca).join('\n');
   }
 
   var api = {classificarUS: classificarUS, classificarRM: classificarRM, fraseLaudo: fraseLaudo,

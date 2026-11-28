@@ -104,3 +104,17 @@ const b = { rm_tec: 'sim', rm_perit: 'nao', rm_achado: 'para' };
 assert.ok(/American College of Radiology/.test(fraseLaudo(classificarRM(b), b))); n++;
 
 console.log(n + ' testes OK');
+
+// Frase do laudo: em cada linha, ponto só no final (vírgulas no meio)
+{
+  const casos = [
+    Object.assign({ us_tec: 'sim', us_tipo: 'classico', us_classico: 'hemorragico', us_meno: 'pos', us_posmeno: 'precoce', us_tam: 4.5, us_ascite: 'sim', us_nodulos: 'nao', us_etiologia: 'sim' }),
+    Object.assign({ us_tec: 'sim', us_tipo: 'outra', us_meno: 'pre', us_comp: 'solida', us_cext: 'liso', us_sombra: 'sim', us_cs: '2', us_tam: 3.2, us_ascite: 'nao', us_nodulos: 'nao' }),
+  ];
+  for (const c of casos) {
+    const t = fraseLaudo(classificarUS(c), c);
+    for (const l of t.split('\n')) assert.ok(!/\.\s/.test(l) && /[^.]\.$/.test(l), l);
+    assert.ok(/\d,\d cm/.test(t), t);
+  }
+  console.log('frase com ponto só no final: OK');
+}

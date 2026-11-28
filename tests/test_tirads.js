@@ -47,3 +47,7 @@ const f = fraseLaudo(classificar(a), a);
 assert.ok(/Nódulo no lobo direito, sólido/.test(f) && /TI-RADS 5/.test(f) && /1,8 cm/.test(f) && /American College of Radiology/.test(f), f); n++;
 
 console.log(n + ' testes OK');
+
+// Frase do laudo: em cada linha, ponto só no final
+for (const l of f.split('\n')) assert.ok(!/\.\s/.test(l) && /[^.]\.$/.test(l), l);
+console.log('frase com ponto só no final: OK');
